@@ -1,1 +1,0 @@
-# gestao-estudios-tatuagens
