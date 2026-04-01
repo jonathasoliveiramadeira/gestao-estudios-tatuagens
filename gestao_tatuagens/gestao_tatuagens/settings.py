@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app_gestao_tatuagens',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
