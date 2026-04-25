@@ -4,6 +4,7 @@ from .models.tatuador import Tatuador
 from .models.cliente import Cliente
 from .models.agendamento import Agendamento
 from .models.avaliacao import Avaliacao
+from .models.usuario import Usuario
 
 
 class ServicoSerializer(serializers.ModelSerializer):
@@ -30,3 +31,12 @@ class ClienteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cliente
         fields = '__all__'
+
+class UsuarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Usuario
+        fields = ['email', 'password', 'tipo_usuario']
+
+    def create(self, validated_data):
+        user = Usuario.objects.create_user(**validated_data)
+        return user
