@@ -1,6 +1,9 @@
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from django.contrib.auth import logout
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from .models.servico import Servico
 from .serializers import ServicoSerializer
@@ -124,3 +127,10 @@ def usuario_logado(request):
         })
 
     return Response({"erro": "Não autenticado"}, status=401)
+
+# ==========================================
+# LOGOUT (IMPORTANTE PRO REACT)
+# ==========================================
+def logout_view(request):
+    logout(request)
+    return JsonResponse({"message": "Logout realizado com sucesso"})

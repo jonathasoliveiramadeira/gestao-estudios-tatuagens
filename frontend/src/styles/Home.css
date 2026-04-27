@@ -79,3 +79,51 @@
 .logo img {
   height: 50px;
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
+.sobre {
+  padding: 80px 20px;
+  background: transparent;
+  text-align: center;
+  color: white;
+}
+
+.sobre-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.sobre h2 {
+  font-size: 32px;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.sobre-intro {
+  font-size: 18px;
+  margin-bottom: 40px;
+  color: #ccc;
+}
+
+.sobre-cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.card {
+  background: #111;
+  padding: 20px;
+  border-radius: 10px;
+  width: 280px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}

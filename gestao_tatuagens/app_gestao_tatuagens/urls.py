@@ -8,6 +8,7 @@ from .views import (
     TatuadorViewSet,
     UsuarioViewSet,
     usuario_logado,
+    logout_view,
 )
 
 router = DefaultRouter()
@@ -21,4 +22,5 @@ router.register(r'usuarios', UsuarioViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('usuario/', usuario_logado),
+    path('logout/', logout_view),
 ]

@@ -22,8 +22,10 @@ class UsuarioManager(BaseUserManager):
             return self.create_user(email, password, **extra_fields)
 
 class Usuario(AbstractUser):
-    username = None
+    username = None # Removendo o campo username
     email = models.EmailField(unique=True)
+
+    nome = models.CharField(max_length=255, blank=True, null=True)
 
     tipo_usuario = models.CharField(max_length=20, choices=TipoUsuario.choices, verbose_name="Tipo de Usuário", help_text="Marque se você é um tatuador ou cliente.")
 

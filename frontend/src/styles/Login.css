@@ -121,3 +121,21 @@
     padding: 30px;
   }
 }
+
+.alerta {
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.alerta.error {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+.alerta.success {
+  background-color: #52c41a;
+  color: white;
+}

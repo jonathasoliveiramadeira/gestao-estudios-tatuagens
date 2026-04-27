@@ -12,7 +12,11 @@ export default function Login() {
     tipo_usuario: ""
   });
 
-  const [erro, setErro] = useState("");
+  const [alerta, setAlerta] = useState({
+    mensagem: "",
+    tipo: ""
+  });
+
   const [loading, setLoading] = useState(false);
 
   // =========================
@@ -30,22 +34,32 @@ export default function Login() {
   // =========================
   const validar = () => {
     if (!form.email || !form.password || !form.tipo_usuario) {
-      setErro("Preencha todos os campos!");
+      showAlert("Preencha todos os campos!", "error");
       return false;
     }
 
     if (!form.email.includes("@")) {
-      setErro("Email inválido!");
+      showAlert("Email inválido!", "error");
       return false;
     }
 
     if (form.password.length < 6) {
-      setErro("Senha deve ter pelo menos 6 caracteres");
+      showAlert("Senha deve ter pelo menos 6 caracteres", "error");
       return false;
     }
 
-    setErro("");
     return true;
+  };
+
+  // =========================
+  // Função de alerta
+  // =========================
+  const showAlert = (mensagem, tipo) => {
+    setAlerta({ mensagem, tipo });
+
+    setTimeout(() => {
+      setAlerta({ mensagem: "", tipo: "" });
+    }, 3000);
   };
 
   // =========================
@@ -59,27 +73,29 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // 👇 AGORA pegamos a resposta
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/usuarios/",
+        "http://localhost:8000/api/usuarios/",
         form
       );
 
-      // 👇 SALVA no localStorage
       localStorage.setItem("usuario", JSON.stringify(response.data));
 
-      alert("Conta criada com sucesso! 🎉");
+      showAlert("Conta criada com sucesso! 🎉", "success");
 
-      // redireciona para home
-      navigate("/");
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
 
     } catch (err) {
       console.error(err);
 
-      if (err.response?.data) {
-        setErro("Erro: " + JSON.stringify(err.response.data));
+      if (err.response?.data?.email) {
+        showAlert(
+          "Este email já está cadastrado. Deseja fazer login ou recuperar a senha?",
+          "error"
+        );
       } else {
-        setErro("Erro ao criar conta. Tente novamente.");
+        showAlert("Erro ao criar conta. Tente novamente.", "error");
       }
 
     } finally {
@@ -88,17 +104,23 @@ export default function Login() {
   };
 
   // =========================
-  // Login com Google
+  // Login Google
   // =========================
   const handleGoogleLogin = () => {
-    window.location.href = "http://127.0.0.1:8000/accounts/google/login/";
+    window.location.href =
+      "http://localhost:8000/accounts/google/login/";
   };
 
   return (
     <div className="login-container">
       <h2>Criar Conta</h2>
 
-      {erro && <p className="erro">{erro}</p>}
+      {/* ALERTA */}
+      {alerta.mensagem && (
+        <div className={`alerta ${alerta.tipo}`}>
+          {alerta.mensagem}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit}>
         <input
@@ -131,6 +153,13 @@ export default function Login() {
           {loading ? "Criando..." : "Criar conta"}
         </button>
       </form>
+
+      {/* ESQUECI SENHA */}
+      <p className="forgot-password">
+        <span onClick={() => navigate("/recuperar")}>
+          Esqueceu a senha?
+        </span>
+      </p>
 
       <div className="divider">
         <span>ou</span>

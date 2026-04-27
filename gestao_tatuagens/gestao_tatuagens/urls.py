@@ -16,9 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from app_gestao_tatuagens.views import usuario_logado
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('app_gestao_tatuagens.urls')),
     path('accounts/', include('allauth.urls')),
+    path('api/password_reset/', include('django_rest_passwordreset.urls')),
+    path('api/me/', usuario_logado),
 ]
