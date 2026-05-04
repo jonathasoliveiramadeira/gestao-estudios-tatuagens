@@ -43,6 +43,9 @@ class UsuarioSerializer(serializers.ModelSerializer):
         return user
     
 class PortfolioSerializer(serializers.ModelSerializer):
+    tatuador_nome = serializers.CharField(source="tatuador.usuario.nome", read_only=True)
+
     class Meta:
         model = Portfolio
         fields = '__all__'
+        read_only_fields = ['tatuador']

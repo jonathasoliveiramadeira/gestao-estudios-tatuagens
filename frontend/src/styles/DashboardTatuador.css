@@ -1,0 +1,108 @@
+/* CONTAINER GERAL */
+.dashboard {
+  min-height: 100vh;
+  background: #0f0f0f;
+  color: #fff;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+/* CARD PRINCIPAL */
+.dashboard-container {
+  width: 100%;
+  max-width: 800px;
+  background: #1a1a1a;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+}
+
+/* TÍTULO */
+.dashboard h2 {
+  margin-bottom: 25px;
+  text-align: center;
+  font-size: 28px;
+  letter-spacing: 1px;
+}
+
+/* FORM */
+.dashboard form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* INPUTS */
+.dashboard input,
+.dashboard textarea {
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background: #2a2a2a;
+  color: #fff;
+  font-size: 14px;
+}
+
+.dashboard input::placeholder,
+.dashboard textarea::placeholder {
+  color: #aaa;
+}
+
+/* TEXTAREA */
+.dashboard textarea {
+  resize: none;
+  min-height: 80px;
+}
+
+/* INPUT FILE */
+.dashboard input[type="file"] {
+  background: none;
+  padding: 5px;
+  color: #ccc;
+}
+
+/* PREVIEW */
+.preview {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.preview img {
+  width: 220px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid #333;
+}
+
+/* BOTÃO */
+.dashboard button {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: #00bcd4;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* HOVER */
+.dashboard button:hover {
+  background: #0097a7;
+  transform: scale(1.02);
+}
+
+/* RESPONSIVO */
+@media (max-width: 600px) {
+  .dashboard-container {
+    padding: 20px;
+  }
+
+  .preview img {
+    width: 100%;
+  }
+}

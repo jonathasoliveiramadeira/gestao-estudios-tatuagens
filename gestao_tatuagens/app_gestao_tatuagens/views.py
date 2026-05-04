@@ -207,13 +207,33 @@ def csrf(request):
 # PORTFOLIO
 # ==========================================
 class PortfolioViewSet(viewsets.ModelViewSet):
-    queryset = Portfolio.objects.all()
+    queryset = Portfolio.objects.all().order_by("-criado_em")
     serializer_class = PortfolioSerializer
 
     def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [IsTatuador()]
-        return [permissions.AllowAny()]
+        if self.action in ['create', 'update', 'destroy']:
+            return [IsAuthenticated(), IsTatuador()]
+        return [AllowAny()]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        tatuador_id = self.request.query_params.get('tatuador')
+        destaque = self.request.query_params.get('destaque')
+
+        if tatuador_id:
+            queryset = queryset.filter(tatuador_id=tatuador_id)
+
+        if destaque:
+            queryset = queryset.filter(destaque=True)
+
+        return queryset
+    
+    def perform_create(self, serializer):
+        usuario = self.request.user
+        tatuador, _ = Tatuador.objects.get_or_create(usuario=usuario)
+
+        serializer.save(tatuador=tatuador)
     
 # ==========================================
 # LOGIN GOOGLE

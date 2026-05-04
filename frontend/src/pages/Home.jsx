@@ -8,8 +8,9 @@ import { AuthContext } from "../contexts/AuthContext";
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
-  const { user, login } = useContext(AuthContext); // 🔥 usa contexto
+  const { user, login } = useContext(AuthContext);
   const [usuario, setUsuario] = useState(null);
+  const [portfolios, setPortfolios] = useState([]);
   const navigate = useNavigate();
 
   // =========================
@@ -25,7 +26,6 @@ export default function Home() {
   useEffect(() => {
     const url = new URL(window.location.href);
 
-    // limpa params do Google
     if (url.searchParams.get("code") || url.searchParams.get("state")) {
       window.history.replaceState({}, document.title, "/");
     }
@@ -50,8 +50,25 @@ export default function Home() {
   }, []);
 
   // =========================
+  // BUSCAR PORTFÓLIOS
+  // =========================
+  useEffect(() => {
+    axios.get("http://localhost:8000/api/portfolios/")
+      .then(res => {
+        setPortfolios(res.data);
+      })
+      .catch(err => {
+        console.error("Erro ao buscar portfólios:", err);
+      });
+  }, []);
+
+  // =========================
   const irParaPerfil = () => {
     navigate("/perfil");
+  };
+
+  const irParaDashboard = () => {
+    navigate("/dashboard-tatuador");
   };
 
   return (
@@ -73,7 +90,6 @@ export default function Home() {
         {usuario ? (
           <div className="user-info">
 
-            {/* Nome */}
             <span className="user-name">
               Olá,{" "}
               {usuario.first_name
@@ -81,13 +97,20 @@ export default function Home() {
                 : usuario.email.split("@")[0]}
             </span>
 
+            {/* 🔥 BOTÃO DO TATUADOR */}
+            {usuario.tipo_usuario === "TATUADOR" && (
+              <button
+                onClick={irParaDashboard}
+                className="tatuador-btn"
+              >
+                Meu Estúdio
+              </button>
+            )}
+
             {/* Avatar */}
             <div className="avatar" onClick={irParaPerfil}>
               {usuario.foto ? (
-                <img
-                  src={usuario.foto} // 🔥 já vem completo do backend
-                  alt="Perfil"
-                />
+                <img src={usuario.foto} alt="Perfil" />
               ) : (
                 (usuario.first_name || usuario.email)
                   .charAt(0)
@@ -160,20 +183,32 @@ export default function Home() {
           <h2>Portfólios em destaque</h2>
 
           <div className="portfolio-cards">
-            <div className="portfolio-card">
-              <img src="https://via.placeholder.com/300x200" alt="Tatuador" />
-              <h3>Nome do Tatuador</h3>
-            </div>
 
-            <div className="portfolio-card">
-              <img src="https://via.placeholder.com/300x200" alt="Tatuador" />
-              <h3>Nome do Tatuador</h3>
-            </div>
+            {portfolios.length > 0 ? (
+              portfolios.map((item) => (
+                <div key={item.id} className="portfolio-card">
 
-            <div className="portfolio-card">
-              <img src="https://via.placeholder.com/300x200" alt="Tatuador" />
-              <h3>Nome do Tatuador</h3>
-            </div>
+                  <img
+                    src={
+                      item.imagem
+                        ? item.imagem.startsWith("http")
+                          ? item.imagem
+                          : `http://localhost:8000${item.imagem}`
+                        : "https://via.placeholder.com/400x300"
+                    }
+                    alt={item.titulo}
+                  />
+
+                  <h3>{item.tatuador_nome || "Tatuador"}</h3>
+
+                  <p>{item.estilo || "Estilo não informado"}</p>
+
+                </div>
+              ))
+            ) : (
+              <p>Carregando portfólios...</p>
+            )}
+
           </div>
         </div>
       </section>
@@ -182,7 +217,7 @@ export default function Home() {
       <LoginModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        onLogin={login} // 🔥 usa contexto
+        onLogin={login}
       />
 
     </div>
