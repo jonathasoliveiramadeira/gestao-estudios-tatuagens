@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -145,7 +146,8 @@ SOCIALACCOUNT_QUERY_EMAIL = True
 # =========================
 # REDIRECTS
 # =========================
-LOGIN_REDIRECT_URL = "http://localhost:5173"
+# LOGIN_REDIRECT_URL = "http://localhost:5173"
+LOGIN_REDIRECT_URL = "/google-success/"
 LOGOUT_REDIRECT_URL = "http://localhost:5173"
 
 
@@ -164,3 +166,23 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SOCIALACCOUNT_ADAPTER = 'app_gestao_tatuagens.adapters.CustomSocialAccountAdapter'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}

@@ -16,12 +16,58 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from app_gestao_tatuagens.views import usuario_logado
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
+# Views personalizadas
+from app_gestao_tatuagens.views import (
+    usuario_logado,
+    login_view,
+    logout_view,
+    atualizar_usuario,
+    deletar_usuario,
+    google_login_success,
+)
+
+# IMPORTANTE (imagens/media)
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # Rotas da sua app
     path('api/', include('app_gestao_tatuagens.urls')),
+
+    # Auth (Google / Allauth)
     path('accounts/', include('allauth.urls')),
+
+    # Reset de senha
     path('api/password_reset/', include('django_rest_passwordreset.urls')),
+
+    # Usuário logado
     path('api/me/', usuario_logado),
+
+    # Login e login google
+    path('api/login/', login_view),
+    path("google-success/", google_login_success),
+
+    # Logout
+    path('api/logout/', logout_view),
+
+    # Atualizar usuário (foto + tipo)
+    path('api/atualizar_usuario/', atualizar_usuario),
+
+    # Deletar conta
+    path('api/deletar_usuario/', deletar_usuario),
+
+    # JWT
+    path('api/token/', TokenObtainPairView.as_view()),
+    path('api/token/refresh/', TokenRefreshView.as_view()),
 ]
+
+# SERVIR IMAGENS (ESSENCIAL PRA FOTO FUNCIONAR)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

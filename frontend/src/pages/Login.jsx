@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import axios from "axios";
 import "../styles/Login.css";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../contexts/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
+
+  const [modoLogin, setModoLogin] = useState(false);
 
   const [form, setForm] = useState({
     email: "",
@@ -20,8 +24,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   // =========================
-  // Atualiza campos
-  // =========================
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -30,10 +32,17 @@ export default function Login() {
   };
 
   // =========================
-  // Validação
+  const showAlert = (mensagem, tipo) => {
+    setAlerta({ mensagem, tipo });
+
+    setTimeout(() => {
+      setAlerta({ mensagem: "", tipo: "" });
+    }, 3000);
+  };
+
   // =========================
   const validar = () => {
-    if (!form.email || !form.password || !form.tipo_usuario) {
+    if (!form.email || !form.password || (!modoLogin && !form.tipo_usuario)) {
       showAlert("Preencha todos os campos!", "error");
       return false;
     }
@@ -52,18 +61,7 @@ export default function Login() {
   };
 
   // =========================
-  // Função de alerta
-  // =========================
-  const showAlert = (mensagem, tipo) => {
-    setAlerta({ mensagem, tipo });
-
-    setTimeout(() => {
-      setAlerta({ mensagem: "", tipo: "" });
-    }, 3000);
-  };
-
-  // =========================
-  // Criar conta
+  // 🚀 SUBMIT (LOGIN OU CADASTRO)
   // =========================
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -73,29 +71,57 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/usuarios/",
-        form
-      );
+      if (modoLogin) {
+        // 🔐 LOGIN COM JWT
+        const response = await axios.post(
+          "http://localhost:8000/api/login/",
+          {
+            email: form.email,
+            password: form.password
+          }
+        );
 
-      localStorage.setItem("usuario", JSON.stringify(response.data));
+        const { access, user } = response.data;
 
-      showAlert("Conta criada com sucesso! 🎉", "success");
+        // salvar token
+        localStorage.setItem("token", access);
+        localStorage.setItem("usuario", JSON.stringify(user));
 
-      setTimeout(() => {
-        navigate("/");
-      }, 1500);
+        // atualizar contexto
+        login({ access, user });
+
+        showAlert("Login realizado com sucesso! 🚀", "success");
+
+        // 🎯 REDIRECT AUTOMÁTICO
+        setTimeout(() => {
+          if (user.tipo_usuario === "TATUADOR") {
+            navigate("/dashboard-tatuador");
+          } else {
+            navigate("/");
+          }
+        }, 1000);
+
+      } else {
+        // 🧾 CADASTRO
+        await axios.post(
+          "http://localhost:8000/api/usuarios/",
+          form
+        );
+
+        showAlert("Conta criada! Agora faça login 😉", "success");
+
+        setModoLogin(true);
+      }
 
     } catch (err) {
       console.error(err);
 
-      if (err.response?.data?.email) {
-        showAlert(
-          "Este email já está cadastrado. Deseja fazer login ou recuperar a senha?",
-          "error"
-        );
+      if (modoLogin) {
+        showAlert("Email ou senha inválidos!", "error");
+      } else if (err.response?.data?.email) {
+        showAlert("Email já cadastrado!", "error");
       } else {
-        showAlert("Erro ao criar conta. Tente novamente.", "error");
+        showAlert("Erro. Tente novamente.", "error");
       }
 
     } finally {
@@ -104,8 +130,6 @@ export default function Login() {
   };
 
   // =========================
-  // Login Google
-  // =========================
   const handleGoogleLogin = () => {
     window.location.href =
       "http://localhost:8000/accounts/google/login/";
@@ -113,7 +137,7 @@ export default function Login() {
 
   return (
     <div className="login-container">
-      <h2>Criar Conta</h2>
+      <h2>{modoLogin ? "Entrar" : "Criar Conta"}</h2>
 
       {/* ALERTA */}
       {alerta.mensagem && (
@@ -139,20 +163,32 @@ export default function Login() {
           onChange={handleChange}
         />
 
-        <select
-          name="tipo_usuario"
-          value={form.tipo_usuario}
-          onChange={handleChange}
-        >
-          <option value="">Selecione o tipo</option>
-          <option value="CLIENTE">Cliente</option>
-          <option value="TATUADOR">Tatuador</option>
-        </select>
+        {!modoLogin && (
+          <select
+            name="tipo_usuario"
+            value={form.tipo_usuario}
+            onChange={handleChange}
+          >
+            <option value="">Selecione o tipo</option>
+            <option value="CLIENTE">Cliente</option>
+            <option value="TATUADOR">Tatuador</option>
+          </select>
+        )}
 
         <button type="submit" disabled={loading}>
-          {loading ? "Criando..." : "Criar conta"}
+          {loading
+            ? modoLogin ? "Entrando..." : "Criando..."
+            : modoLogin ? "Entrar" : "Criar conta"}
         </button>
       </form>
+
+      {/* TROCAR MODO */}
+      <p className="toggle-mode">
+        {modoLogin ? "Não tem conta?" : "Já tem conta?"}
+        <span onClick={() => setModoLogin(!modoLogin)}>
+          {modoLogin ? " Criar conta" : " Entrar"}
+        </span>
+      </p>
 
       {/* ESQUECI SENHA */}
       <p className="forgot-password">

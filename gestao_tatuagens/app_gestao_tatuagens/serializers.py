@@ -5,6 +5,7 @@ from .models.cliente import Cliente
 from .models.agendamento import Agendamento
 from .models.avaliacao import Avaliacao
 from .models.usuario import Usuario
+from .models.portfolio import Portfolio
 
 
 class ServicoSerializer(serializers.ModelSerializer):
@@ -35,8 +36,13 @@ class ClienteSerializer(serializers.ModelSerializer):
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
-        fields = ['email', 'password', 'tipo_usuario']
+        fields = "__all__"
 
     def create(self, validated_data):
         user = Usuario.objects.create_user(**validated_data)
         return user
+    
+class PortfolioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Portfolio
+        fields = '__all__'

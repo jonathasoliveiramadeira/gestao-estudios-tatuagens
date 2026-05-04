@@ -26,6 +26,7 @@ class Usuario(AbstractUser):
     email = models.EmailField(unique=True)
 
     nome = models.CharField(max_length=255, blank=True, null=True)
+    foto = models.ImageField(upload_to='perfis/', blank=True, null=True)
 
     tipo_usuario = models.CharField(max_length=20, choices=TipoUsuario.choices, verbose_name="Tipo de Usuário", help_text="Marque se você é um tatuador ou cliente.")
 

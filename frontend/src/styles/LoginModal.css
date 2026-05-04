@@ -78,3 +78,9 @@
 .logout-btn:hover {
   background: #e60000;
 }
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+}

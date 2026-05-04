@@ -5,3 +5,4 @@ from .agendamento import *
 from .servico import *
 from .avaliacao import *
 from .usuario import *
+from .portfolio import *

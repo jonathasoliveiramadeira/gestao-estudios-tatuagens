@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/LoginModal.css";
 
@@ -9,9 +9,27 @@ export default function LoginModal({ isOpen, onClose, onLogin }) {
   });
 
   const [erro, setErro] = useState("");
+  const [loading, setLoading] = useState(false);
 
+  // ✅ HOOKS SEMPRE NO TOPO
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEsc = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+
+    window.addEventListener("keydown", handleEsc);
+
+    return () => {
+      window.removeEventListener("keydown", handleEsc);
+    };
+  }, [isOpen, onClose]);
+
+  // 🚨 AGORA SIM pode fazer o return condicional
   if (!isOpen) return null;
 
+  // =========================
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -19,8 +37,10 @@ export default function LoginModal({ isOpen, onClose, onLogin }) {
     });
   };
 
+  // =========================
   const handleLogin = async (e) => {
     e.preventDefault();
+    setErro("");
 
     if (!form.email || !form.password) {
       setErro("Preencha todos os campos");
@@ -28,46 +48,55 @@ export default function LoginModal({ isOpen, onClose, onLogin }) {
     }
 
     try {
+      setLoading(true);
+
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/login/",
-        form
+        "http://localhost:8000/api/login/",
+        {
+          email: form.email,
+          password: form.password
+        }
       );
 
-      localStorage.setItem("usuario", JSON.stringify(response.data));
+      const { access, user } = response.data;
 
-      onLogin(response.data);
+      localStorage.setItem("token", access);
+      localStorage.setItem("usuario", JSON.stringify(user));
+
+      if (onLogin) onLogin({ access, user });
+
       onClose();
 
     } catch (err) {
-      setErro("Email ou senha inválidos");
+      console.error("Erro login:", err.response || err);
+
+      if (err.response?.status === 400) {
+        setErro("Email ou senha inválidos");
+      } else {
+        setErro("Erro ao conectar com o servidor");
+      }
+
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleGoogleLogin = () => {
     window.location.href =
-      "http://127.0.0.1:8000/accounts/google/login/";
-  };
-
-  const handleLogout = async () => {
-    try {
-      await axios.post("http://localhost:8000/api/logout/", {}, {
-        withCredentials: true
-      });
-
-      // limpa usuário
-      setUsuario(null);
-      localStorage.removeItem("usuario");
-
-    } catch (error) {
-      console.error("Erro ao fazer logout", error);
-    }
+      "http://localhost:8000/accounts/google/login/";
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal">
+    <div className="modal-overlay" onClick={onClose}>
+      
+      <div
+        className="modal"
+        onClick={(e) => e.stopPropagation()}
+      >
 
-        <button className="close-btn" onClick={onClose}>X</button>
+        <button className="close-btn" onClick={onClose}>
+          ✕
+        </button>
 
         <h2>Entrar</h2>
 
@@ -78,6 +107,7 @@ export default function LoginModal({ isOpen, onClose, onLogin }) {
             type="email"
             name="email"
             placeholder="Email"
+            value={form.email}
             onChange={handleChange}
           />
 
@@ -85,17 +115,24 @@ export default function LoginModal({ isOpen, onClose, onLogin }) {
             type="password"
             name="password"
             placeholder="Senha"
+            value={form.password}
             onChange={handleChange}
           />
 
-          <button type="submit">Entrar</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Entrando..." : "Entrar"}
+          </button>
         </form>
 
         <div className="divider">
           <span>ou</span>
         </div>
 
-        <button className="google-btn" onClick={handleGoogleLogin}>
+        <button
+          className="google-btn"
+          onClick={handleGoogleLogin}
+          disabled={loading}
+        >
           Entrar com Google
         </button>
 
