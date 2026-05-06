@@ -23,10 +23,19 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
         model = Avaliacao
         fields = '__all__'
 
+class PortfolioResumoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Portfolio
+        fields = ["id", "imagem", "titulo"]
+
+
 class TatuadorSerializer(serializers.ModelSerializer):
+    portfolios = PortfolioResumoSerializer(many=True, read_only=True)
+
     class Meta:
         model = Tatuador
-        fields = '__all__'
+        fields = "__all__"
+        read_only_fields = ["usuario"]
 
 class ClienteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -43,7 +52,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
         return user
     
 class PortfolioSerializer(serializers.ModelSerializer):
-    tatuador_nome = serializers.CharField(source="tatuador.usuario.nome", read_only=True)
+    tatuador_nome = serializers.CharField(source="tatuador.usuario.first_name", read_only=True)
 
     class Meta:
         model = Portfolio

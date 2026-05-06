@@ -6,6 +6,8 @@ import Perfil from "./pages/Perfil";
 import PrivateRoute from "./routes/PrivateRoute";
 import DashboardTatuador from "./pages/DashboardTatuador";
 import GoogleSuccess from "./pages/GoogleSuccess";
+import Tatuador from "./pages/Tatuador";
+import EditarEstudio from "./pages/EditarEstudio";
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
         <Route path="/google-success" element={<GoogleSuccess />} />
         {/* ROTA PROTEGIDA */}
         <Route path="/dashboard-tatuador" element={<PrivateRoute tipo="TATUADOR"><DashboardTatuador /></PrivateRoute>} />
+        <Route path="/tatuador/:id" element={<Tatuador />} />
+        <Route path="/editar-estudio" element={<EditarEstudio />} />
       </Routes>
     </BrowserRouter>
   );

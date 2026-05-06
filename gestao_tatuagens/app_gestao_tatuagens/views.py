@@ -1,5 +1,5 @@
 from rest_framework import viewsets, permissions
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -29,7 +29,9 @@ from .serializers import UsuarioSerializer
 
 from .models.portfolio import Portfolio
 from .serializers import PortfolioSerializer
+
 from .permissions import IsTatuador
+
 
 # ==========================================
 # SERVIÇOS
@@ -94,12 +96,33 @@ class ClienteViewSet(viewsets.ModelViewSet):
 
 
 # ==========================================
-# TATUADOR
+# TATUADOR (🔥 CORRIGIDO E COMPLETO)
 # ==========================================
 class TatuadorViewSet(viewsets.ModelViewSet):
-    queryset = Tatuador.objects.all()
+    queryset = Tatuador.objects.all().prefetch_related("portfolios")
     serializer_class = TatuadorSerializer
-    permission_classes = [permissions.AllowAny]
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy', 'me']:
+            return [IsAuthenticated()]
+        return [AllowAny()]
+
+    # 🔥 ENDPOINT: /api/tatuadores/me/
+    @action(detail=False, methods=['get'])
+    def me(self, request):
+        tatuador, _ = Tatuador.objects.get_or_create(usuario=request.user)
+        serializer = self.get_serializer(tatuador)
+        return Response(serializer.data)
+
+    # 🔒 GARANTE QUE SÓ EDITA O PRÓPRIO ESTÚDIO
+    def perform_update(self, serializer):
+        if self.get_object().usuario != self.request.user:
+            raise PermissionError("Você não pode editar este estúdio.")
+        serializer.save()
+
+    # 🔒 GARANTE QUE CRIA VINCULADO AO USER
+    def perform_create(self, serializer):
+        serializer.save(usuario=self.request.user)
 
 
 # ==========================================
@@ -138,7 +161,6 @@ def login_view(request):
     user = authenticate(request, email=email, password=password)
 
     if user is not None:
-        # GERAR TOKEN JWT
         refresh = RefreshToken.for_user(user)
 
         return Response({
@@ -154,13 +176,13 @@ def login_view(request):
 
     return Response({"error": "Credenciais inválidas"}, status=400)
 
+
 # ==========================================
-# LOGOUT (CORRIGIDO)
+# LOGOUT
 # ==========================================
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
-    # logout(request)
     return Response({"message": "Logout realizado com sucesso"})
 
 
@@ -197,11 +219,12 @@ def deletar_usuario(request):
 
 
 # ==========================================
-# CSRF (ESSENCIAL PRO LOGIN)
+# CSRF
 # ==========================================
 @ensure_csrf_cookie
 def csrf(request):
     return JsonResponse({"message": "CSRF cookie set"})
+
 
 # ==========================================
 # PORTFOLIO
@@ -228,13 +251,13 @@ class PortfolioViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(destaque=True)
 
         return queryset
-    
+
     def perform_create(self, serializer):
         usuario = self.request.user
         tatuador, _ = Tatuador.objects.get_or_create(usuario=usuario)
-
         serializer.save(tatuador=tatuador)
-    
+
+
 # ==========================================
 # LOGIN GOOGLE
 # ==========================================
@@ -243,13 +266,9 @@ def google_login_success(request):
         return redirect("http://localhost:5173")
 
     user = request.user
-
-    # gerar JWT
     refresh = RefreshToken.for_user(user)
-
     access_token = str(refresh.access_token)
 
-    # redireciona pro frontend com token
     return redirect(
         f"http://localhost:5173/google-success?token={access_token}"
     )

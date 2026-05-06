@@ -10,7 +10,8 @@ export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   const { user, login } = useContext(AuthContext);
   const [usuario, setUsuario] = useState(null);
-  const [portfolios, setPortfolios] = useState([]);
+  const [tatuadores, setTatuadores] = useState([]);
+
   const navigate = useNavigate();
 
   // =========================
@@ -50,15 +51,15 @@ export default function Home() {
   }, []);
 
   // =========================
-  // BUSCAR PORTFÓLIOS
+  // BUSCAR TATUADORES
   // =========================
   useEffect(() => {
-    axios.get("http://localhost:8000/api/portfolios/")
+    axios.get("http://localhost:8000/api/tatuadores/")
       .then(res => {
-        setPortfolios(res.data);
+        setTatuadores(res.data);
       })
       .catch(err => {
-        console.error("Erro ao buscar portfólios:", err);
+        console.error("Erro ao buscar tatuadores:", err);
       });
   }, []);
 
@@ -69,6 +70,10 @@ export default function Home() {
 
   const irParaDashboard = () => {
     navigate("/dashboard-tatuador");
+  };
+
+  const irParaTatuador = (id) => {
+    navigate(`/tatuador/${id}`);
   };
 
   return (
@@ -83,8 +88,31 @@ export default function Home() {
         <nav className="menu">
           <a href="#">INICIO</a>
           <a href="#sobre">SOBRE NÓS</a>
-          <a href="#portfolio">PORTFÓLIOS</a>
-          <a href="#">SOU TATUADOR</a>
+          <a href="#portfolio">ESTÚDIOS</a>
+
+          {usuario?.tipo_usuario?.toLowerCase() === "tatuador" && (
+            <>
+              <a
+                href="/dashboard-tatuador"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/dashboard-tatuador");
+                }}
+              >
+                MEU ESTÚDIO
+              </a>
+
+              <a
+                href="/editar-estudio"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/editar-estudio");
+                }}
+              >
+                EDITAR ESTÚDIO
+              </a>
+            </>
+          )}
         </nav>
 
         {usuario ? (
@@ -96,16 +124,6 @@ export default function Home() {
                 ? usuario.first_name
                 : usuario.email.split("@")[0]}
             </span>
-
-            {/* 🔥 BOTÃO DO TATUADOR */}
-            {usuario.tipo_usuario === "TATUADOR" && (
-              <button
-                onClick={irParaDashboard}
-                className="tatuador-btn"
-              >
-                Meu Estúdio
-              </button>
-            )}
 
             {/* Avatar */}
             <div className="avatar" onClick={irParaPerfil}>
@@ -177,36 +195,68 @@ export default function Home() {
         </div>
       </section>
 
-      {/* PORTFÓLIO */}
+      {/* PORTFÓLIOS (ESTÚDIOS) */}
       <section id="portfolio" className="portfolio">
         <div className="portfolio-container">
-          <h2>Portfólios em destaque</h2>
+          <h2>Estúdios em destaque</h2>
 
-          <div className="portfolio-cards">
+          <div className="studio-cards">
 
-            {portfolios.length > 0 ? (
-              portfolios.map((item) => (
-                <div key={item.id} className="portfolio-card">
+            {tatuadores.length > 0 ? (
+              tatuadores.map((studio) => (
+                <div
+                  key={studio.id}
+                  className="studio-card"
+                  onClick={() => irParaTatuador(studio.id)}
+                >
 
-                  <img
-                    src={
-                      item.imagem
-                        ? item.imagem.startsWith("http")
-                          ? item.imagem
-                          : `http://localhost:8000${item.imagem}`
-                        : "https://via.placeholder.com/400x300"
-                    }
-                    alt={item.titulo}
-                  />
+                  {/* HEADER */}
+                  <div className="studio-header">
+                    <h3>{studio.nome_estudio || "Estúdio"}</h3>
 
-                  <h3>{item.tatuador_nome || "Tatuador"}</h3>
+                    {studio.logo && (
+                      <img
+                        src={
+                          studio.logo.startsWith("http")
+                            ? studio.logo
+                            : `http://localhost:8000${studio.logo}`
+                        }
+                        alt="logo"
+                        className="studio-logo"
+                      />
+                    )}
+                  </div>
 
-                  <p>{item.estilo || "Estilo não informado"}</p>
+                  {/* DESCRIÇÃO */}
+                  <p className="studio-desc">
+                    {studio.descricao || "Sem descrição"}
+                  </p>
+
+                  {/* GALERIA */}
+                  <div className="studio-gallery">
+                    {studio.portfolios && studio.portfolios.length > 0 ? (
+                      studio.portfolios.slice(0, 6).map((p) => (
+                        <img
+                          key={p.id}
+                          src={
+                            p.imagem.startsWith("http")
+                              ? p.imagem
+                              : `http://localhost:8000${p.imagem}`
+                          }
+                          alt={p.titulo}
+                        />
+                      ))
+                    ) : (
+                      <span style={{ color: "#777" }}>
+                        Sem artes ainda
+                      </span>
+                    )}
+                  </div>
 
                 </div>
               ))
             ) : (
-              <p>Carregando portfólios...</p>
+              <p>Carregando estúdios...</p>
             )}
 
           </div>

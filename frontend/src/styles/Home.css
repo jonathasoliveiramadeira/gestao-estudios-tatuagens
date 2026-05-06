@@ -231,3 +231,65 @@ html {
   height: 100%;
   object-fit: cover; /* 🔥 evita distorção */
 }
+
+/* GRID */
+.studio-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+/* CARD PRINCIPAL */
+.studio-card {
+  background: #111;
+  border-radius: 25px;
+  padding: 25px;
+  transition: 0.3s;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+.studio-card:hover {
+  transform: scale(1.02);
+}
+
+/* HEADER */
+.studio-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.studio-header h3 {
+  font-size: 28px;
+}
+
+/* LOGO */
+.studio-logo {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* DESCRIÇÃO */
+.studio-desc {
+  margin: 15px 0;
+  color: #ccc;
+}
+
+/* GALERIA */
+.studio-gallery {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+}
+
+.studio-gallery img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
