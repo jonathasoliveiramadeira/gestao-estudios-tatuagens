@@ -2,6 +2,7 @@ from django.db import models
 from .cliente import Cliente
 from .tatuador import Tatuador
 from .servico import Servico
+from django.core.exceptions import ValidationError
 
 
 class Agendamento(models.Model):
@@ -55,4 +56,4 @@ class Agendamento(models.Model):
             tatuador=self.tatuador,
             data=self.data
         ).exclude(id=self.id).exists():
-            raise ValueError("Já existe um agendamento para esse horário.")
+            raise ValidationError("Já existe um agendamento para esse horário.")

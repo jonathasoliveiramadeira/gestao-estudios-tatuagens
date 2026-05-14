@@ -14,7 +14,7 @@ export default function Perfil() {
   const navigate = useNavigate();
 
   // =========================
-  // 🔐 Buscar usuário via JWT
+  // Buscar usuário via JWT
   // =========================
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -61,7 +61,7 @@ export default function Perfil() {
   };
 
   // =========================
-  // 💾 SALVAR (JWT)
+  // SALVAR (JWT)
   // =========================
   const salvar = async () => {
     try {
@@ -96,7 +96,7 @@ export default function Perfil() {
   };
 
   // =========================
-  // 🚪 LOGOUT (JWT)
+  // LOGOUT (JWT)
   // =========================
   const logout = () => {
     logoutContext(); // limpa contexto
@@ -104,7 +104,7 @@ export default function Perfil() {
   };
 
   // =========================
-  // ❌ EXCLUIR CONTA
+  // EXCLUIR CONTA
   // =========================
   const excluirConta = async () => {
     if (!window.confirm("Tem certeza que deseja excluir sua conta?")) return;

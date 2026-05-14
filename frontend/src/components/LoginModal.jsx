@@ -11,7 +11,7 @@ export default function LoginModal({ isOpen, onClose, onLogin }) {
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ HOOKS SEMPRE NO TOPO
+  // HOOKS SEMPRE NO TOPO
   useEffect(() => {
     if (!isOpen) return;
 
@@ -26,7 +26,7 @@ export default function LoginModal({ isOpen, onClose, onLogin }) {
     };
   }, [isOpen, onClose]);
 
-  // 🚨 AGORA SIM pode fazer o return condicional
+  // AGORA SIM pode fazer o return condicional
   if (!isOpen) return null;
 
   // =========================

@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, serializers
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -8,12 +8,14 @@ from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import redirect
+from django.utils import timezone
 
 from .models.servico import Servico
 from .serializers import ServicoSerializer
 
 from .models.agendamento import Agendamento
 from .serializers import AgendamentoSerializer
+from datetime import datetime, timedelta
 
 from .models.avaliacao import Avaliacao
 from .serializers import AvaliacaoSerializer
@@ -39,14 +41,55 @@ from .permissions import IsTatuador
 class ServicoViewSet(viewsets.ModelViewSet):
     queryset = Servico.objects.all()
     serializer_class = ServicoSerializer
-    permission_classes = [permissions.AllowAny]
 
+    # ==========================================
+    # PERMISSÕES
+    # ==========================================
+    def get_permissions(self):
+
+        # LISTAR E VISUALIZAR
+        if self.action in ["list", "retrieve"]:
+            return [AllowAny()]
+
+        # CRIAR/EDITAR/EXCLUIR
+        return [IsAuthenticated(), IsTatuador()]
+
+    # ==========================================
+    # QUERYSET
+    # ==========================================
     def get_queryset(self):
-        tatuador_id = self.request.query_params.get('tatuador')
-        if tatuador_id:
-            return Servico.objects.filter(tatuador_id=tatuador_id)
-        return super().get_queryset()
 
+        queryset = Servico.objects.all()
+
+        tatuador_id = self.request.query_params.get("tatuador")
+
+        # CLIENTE BUSCANDO SERVIÇOS
+        if tatuador_id:
+
+            queryset = queryset.filter(
+                tatuador_id=tatuador_id
+            )
+
+        # TATUADOR LOGADO
+        elif (
+            self.request.user.is_authenticated and
+            hasattr(self.request.user, "tatuador")
+        ):
+
+            queryset = queryset.filter(
+                tatuador=self.request.user.tatuador
+            )
+
+        return queryset
+
+    # ==========================================
+    # CRIAR SERVIÇO
+    # ==========================================
+    def perform_create(self, serializer):
+
+        serializer.save(
+            tatuador=self.request.user.tatuador
+        )
 
 # ==========================================
 # AGENDAMENTOS
@@ -54,22 +97,179 @@ class ServicoViewSet(viewsets.ModelViewSet):
 class AgendamentoViewSet(viewsets.ModelViewSet):
     queryset = Agendamento.objects.all()
     serializer_class = AgendamentoSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # ==========================================
+    # PERMISSÕES
+    # ==========================================
+    def get_permissions(self):
 
+        # HORÁRIOS DISPONÍVEIS
+        if self.action == "horarios_disponiveis":
+            return [AllowAny()]
+
+        # DEMAIS AÇÕES
+        return [IsAuthenticated()]
+
+    # ==========================================
+    # QUERYSET
+    # ==========================================
     def get_queryset(self):
-        queryset = super().get_queryset()
 
-        cliente_id = self.request.query_params.get('cliente')
-        tatuador_id = self.request.query_params.get('tatuador')
+        user = self.request.user
 
-        if cliente_id:
-            queryset = queryset.filter(cliente_id=cliente_id)
+        queryset = Agendamento.objects.all()
 
-        if tatuador_id:
-            queryset = queryset.filter(tatuador_id=tatuador_id)
+        if hasattr(user, "cliente"):
+            queryset = queryset.filter(cliente=user.cliente)
+
+        elif hasattr(user, "tatuador"):
+            queryset = queryset.filter(tatuador=user.tatuador)
 
         return queryset
+    
+    # ==========================================
+    # CRIA AGENDAMENTO COM VALIDAÇÕES
+    # ==========================================
+    def perform_create(self, serializer):
 
+        cliente, _ = Cliente.objects.get_or_create(
+            usuario=self.request.user
+        )
+
+        data_agendamento = serializer.validated_data["data"]
+        tatuador = serializer.validated_data["tatuador"]
+        servico = serializer.validated_data["servico"]
+
+        # ==========================================
+        # NÃO PERMITIR DATAS PASSADAS
+        # ==========================================
+        if data_agendamento < timezone.now():
+
+            raise serializers.ValidationError(
+                {"erro": "Não é possível agendar no passado."}
+            )
+
+        # ==========================================
+        # CALCULA HORÁRIO FINAL
+        # ==========================================
+        inicio_novo = data_agendamento
+
+        fim_novo = inicio_novo + timedelta(
+            minutes=servico.duracao_minutos
+        )
+
+        # ==========================================
+        # BUSCA AGENDAMENTOS DO TATUADOR
+        # ==========================================
+        agendamentos = Agendamento.objects.filter(
+            tatuador=tatuador,
+            status__in=["pendente", "confirmado"]
+        )
+
+        # ==========================================
+        # VERIFICA CONFLITOS
+        # ==========================================
+        for agendamento in agendamentos:
+
+            inicio_existente = agendamento.data
+
+            fim_existente = (
+                inicio_existente +
+                timedelta(
+                    minutes=agendamento.servico.duracao_minutos
+                )
+            )
+
+            conflito = (
+                inicio_novo < fim_existente and
+                fim_novo > inicio_existente
+            )
+
+            if conflito:
+
+                raise serializers.ValidationError(
+                    {
+                        "erro": (
+                            "Já existe um agendamento "
+                            "neste horário."
+                        )
+                    }
+                )
+
+        # ==========================================
+        # SALVA
+        # ==========================================
+        serializer.save(cliente=cliente)
+
+    # HORÁRIOS DISPONÍVEIS
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny], url_path="horarios-disponiveis")
+    def horarios_disponiveis(self, request):
+
+        tatuador_id = request.query_params.get("tatuador")
+        data_str = request.query_params.get("data")
+
+        if not tatuador_id or not data_str:
+            return Response(
+                {"erro": "Informe tatuador e data"},
+                status=400
+            )
+
+        try:
+            data = datetime.strptime(data_str, "%Y-%m-%d").date()
+
+        except ValueError:
+            return Response(
+                {"erro": "Formato de data inválido"},
+                status=400
+            )
+
+        # ==========================================
+        # HORÁRIOS PADRÃO
+        # ==========================================
+        horarios = []
+
+        hora_inicio = 9
+        hora_fim = 18
+
+        for hora in range(hora_inicio, hora_fim):
+            horarios.append(f"{hora:02d}:00")
+
+        # ==========================================
+        # AGENDAMENTOS EXISTENTES
+        # ==========================================
+        agendamentos = Agendamento.objects.filter(
+            tatuador_id=tatuador_id,
+            data__date=data,
+            status__in=["pendente", "confirmado"]
+        )
+
+        horarios_ocupados = []
+
+        for agendamento in agendamentos:
+
+            inicio = agendamento.data
+
+            duracao = agendamento.servico.duracao_minutos
+
+            quantidade_blocos = (duracao + 59) // 60
+
+            for i in range(quantidade_blocos):
+
+                horario = (
+                    inicio + timedelta(hours=i)
+                ).strftime("%H:%M")
+
+                horarios_ocupados.append(horario)
+
+        # ==========================================
+        # REMOVE HORÁRIOS OCUPADOS
+        # ==========================================
+        horarios_disponiveis = [
+            horario
+            for horario in horarios
+            if horario not in horarios_ocupados
+        ]
+
+        return Response(horarios_disponiveis)
 
 # ==========================================
 # AVALIAÇÕES
@@ -96,7 +296,7 @@ class ClienteViewSet(viewsets.ModelViewSet):
 
 
 # ==========================================
-# TATUADOR (🔥 CORRIGIDO E COMPLETO)
+# TATUADOR
 # ==========================================
 class TatuadorViewSet(viewsets.ModelViewSet):
     queryset = Tatuador.objects.all().prefetch_related("portfolios")
@@ -107,20 +307,20 @@ class TatuadorViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated()]
         return [AllowAny()]
 
-    # 🔥 ENDPOINT: /api/tatuadores/me/
+    # ENDPOINT: /api/tatuadores/me/
     @action(detail=False, methods=['get'])
     def me(self, request):
         tatuador, _ = Tatuador.objects.get_or_create(usuario=request.user)
         serializer = self.get_serializer(tatuador)
         return Response(serializer.data)
 
-    # 🔒 GARANTE QUE SÓ EDITA O PRÓPRIO ESTÚDIO
+    # GARANTE QUE SÓ EDITA O PRÓPRIO ESTÚDIO
     def perform_update(self, serializer):
         if self.get_object().usuario != self.request.user:
             raise PermissionError("Você não pode editar este estúdio.")
         serializer.save()
 
-    # 🔒 GARANTE QUE CRIA VINCULADO AO USER
+    # GARANTE QUE CRIA VINCULADO AO USER
     def perform_create(self, serializer):
         serializer.save(usuario=self.request.user)
 

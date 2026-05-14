@@ -12,11 +12,34 @@ class ServicoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Servico
         fields = '__all__'
+        read_only_fields = ["tatuador"]
 
 class AgendamentoSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Agendamento
         fields = '__all__'
+        read_only_fields = ['cliente']
+
+    def validate(self, data):
+
+        tatuador = data.get("tatuador")
+        data_agendamento = data.get("data")
+
+        queryset = Agendamento.objects.filter(
+            tatuador=tatuador,
+            data=data_agendamento
+        )
+
+        if self.instance:
+            queryset = queryset.exclude(id=self.instance.id)
+
+        if queryset.exists():
+            raise serializers.ValidationError(
+                "Já existe um agendamento nesse horário."
+            )
+
+        return data
 
 class AvaliacaoSerializer(serializers.ModelSerializer):
     class Meta:

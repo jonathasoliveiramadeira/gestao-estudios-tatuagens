@@ -61,7 +61,7 @@ export default function Login() {
   };
 
   // =========================
-  // 🚀 SUBMIT (LOGIN OU CADASTRO)
+  // SUBMIT (LOGIN OU CADASTRO)
   // =========================
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,7 +72,7 @@ export default function Login() {
 
     try {
       if (modoLogin) {
-        // 🔐 LOGIN COM JWT
+        // LOGIN COM JWT
         const response = await axios.post(
           "http://localhost:8000/api/login/",
           {
@@ -90,9 +90,9 @@ export default function Login() {
         // atualizar contexto
         login({ access, user });
 
-        showAlert("Login realizado com sucesso! 🚀", "success");
+        showAlert("Login realizado com sucesso!", "success");
 
-        // 🎯 REDIRECT AUTOMÁTICO
+        // REDIRECT AUTOMÁTICO
         setTimeout(() => {
           if (user.tipo_usuario === "TATUADOR") {
             navigate("/dashboard-tatuador");
@@ -102,13 +102,13 @@ export default function Login() {
         }, 1000);
 
       } else {
-        // 🧾 CADASTRO
+        // CADASTRO
         await axios.post(
           "http://localhost:8000/api/usuarios/",
           form
         );
 
-        showAlert("Conta criada! Agora faça login 😉", "success");
+        showAlert("Conta criada! Agora faça login.", "success");
 
         setModoLogin(true);
       }

@@ -99,7 +99,7 @@ export default function Home() {
                   navigate("/dashboard-tatuador");
                 }}
               >
-                MEU ESTÚDIO
+                MINHAS ARTES
               </a>
 
               <a
@@ -109,7 +109,7 @@ export default function Home() {
                   navigate("/editar-estudio");
                 }}
               >
-                EDITAR ESTÚDIO
+                MEU ESTÚDIO
               </a>
             </>
           )}

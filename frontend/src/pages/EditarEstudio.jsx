@@ -102,7 +102,7 @@ export default function EditarEstudio() {
         }
       );
 
-      alert("Estúdio atualizado com sucesso! 🎉");
+      alert("Estúdio atualizado com sucesso!");
       navigate("/");
 
     } catch (err) {

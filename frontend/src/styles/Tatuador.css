@@ -21,7 +21,7 @@
 }
 
 .tatuador-container {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -30,44 +30,53 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .tatuador-header h1 {
   font-size: 40px;
+  font-weight: bold;
 }
 
 .tatuador-logo {
-  width: 90px;
-  height: 90px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   object-fit: cover;
+  border: 3px solid #ff3c78;
 }
 
 /* DESCRIÇÃO */
 .tatuador-desc {
+  background: #181818;
+  padding: 20px;
+  border-radius: 16px;
   color: #ccc;
-  margin-bottom: 30px;
-  line-height: 1.6;
+  margin-bottom: 35px;
+  line-height: 1.7;
 }
 
 /* GALERIA */
 .tatuador-gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  margin-bottom: 50px;
 }
 
 .tatuador-gallery img {
   width: 100%;
-  height: 250px;
+  height: 280px;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 18px;
   transition: 0.3s;
+  cursor: pointer;
 }
 
 .tatuador-gallery img:hover {
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 /* LOADING */
@@ -75,4 +84,122 @@
   color: white;
   text-align: center;
   margin-top: 100px;
+}
+
+/* ========================================== */
+/* AGENDAMENTO */
+/* ========================================== */
+.agendamento-container {
+  background: #181818;
+  padding: 35px;
+  border-radius: 20px;
+  margin-top: 30px;
+}
+
+.agendamento-container h2 {
+  margin-bottom: 25px;
+  font-size: 30px;
+}
+
+.agendamento-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.agendamento-form input,
+.agendamento-form select,
+.agendamento-form textarea {
+  width: 100%;
+  background: #111;
+  border: 1px solid #2c2c2c;
+  border-radius: 12px;
+  padding: 14px;
+  color: white;
+  font-size: 15px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.agendamento-form input:focus,
+.agendamento-form select:focus,
+.agendamento-form textarea:focus {
+  border-color: #ff3c78;
+}
+
+.agendamento-form textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.agendamento-form button {
+  background: linear-gradient(135deg, #3ca1ff, #6bf5ff);
+  border: none;
+  color: white;
+  padding: 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.agendamento-form button:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+/* ========================================== */
+/* MENSAGENS */
+/* ========================================== */
+.login-warning {
+  color: #ffb347;
+  background: rgba(255, 179, 71, 0.1);
+  padding: 14px;
+  border-radius: 10px;
+}
+
+.mensagem-agendamento {
+  margin-top: 20px;
+  background: rgba(0, 255, 170, 0.1);
+  color: #00ffaa;
+  padding: 14px;
+  border-radius: 10px;
+}
+
+.loading {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 22px;
+}
+
+/* ========================================== */
+/* RESPONSIVO */
+/* ========================================== */
+@media (max-width: 768px) {
+
+  .tatuador-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tatuador-header h1 {
+    font-size: 32px;
+  }
+
+  .tatuador-logo {
+    width: 100px;
+    height: 100px;
+  }
+
+  .agendamento-container {
+    padding: 22px;
+  }
+
+  .tatuador-gallery img {
+    height: 220px;
+  }
 }

@@ -1,4 +1,6 @@
-/* CONTAINER GERAL */
+/* ========================================== */
+/* GERAL */
+/* ========================================== */
 .dashboard {
   min-height: 100vh;
   background: #0f0f0f;
@@ -8,41 +10,83 @@
   justify-content: center;
 }
 
-/* CARD PRINCIPAL */
 .dashboard-container {
   width: 100%;
-  max-width: 800px;
+  max-width: 1200px;
+}
+
+/* ========================================== */
+/* HEADER */
+/* ========================================== */
+.dashboard-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 35px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.dashboard-header-top h1 {
+  font-size: 38px;
+}
+
+/* ========================================== */
+/* BOTÃO VOLTAR */
+/* ========================================== */
+.back-btn {
+  background: #222;
+  border: none;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.back-btn:hover {
+  background: #333;
+}
+
+/* ========================================== */
+/* SECTIONS */
+/* ========================================== */
+.dashboard-section {
   background: #1a1a1a;
   padding: 30px;
-  border-radius: 16px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+  border-radius: 18px;
+  margin-bottom: 35px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
 }
 
-/* TÍTULO */
-.dashboard h2 {
+.dashboard-section h2 {
   margin-bottom: 25px;
-  text-align: center;
   font-size: 28px;
-  letter-spacing: 1px;
 }
 
+/* ========================================== */
 /* FORM */
+/* ========================================== */
 .dashboard form {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-/* INPUTS */
 .dashboard input,
 .dashboard textarea {
-  padding: 12px;
-  border-radius: 8px;
+  padding: 14px;
+  border-radius: 10px;
   border: none;
   outline: none;
   background: #2a2a2a;
-  color: #fff;
-  font-size: 14px;
+  color: white;
+  font-size: 15px;
+}
+
+.dashboard textarea {
+  resize: vertical;
+  min-height: 100px;
 }
 
 .dashboard input::placeholder,
@@ -50,59 +94,246 @@
   color: #aaa;
 }
 
-/* TEXTAREA */
-.dashboard textarea {
-  resize: none;
-  min-height: 80px;
-}
-
-/* INPUT FILE */
 .dashboard input[type="file"] {
-  background: none;
+  background: transparent;
   padding: 5px;
-  color: #ccc;
 }
 
+/* ========================================== */
 /* PREVIEW */
+/* ========================================== */
 .preview {
-  margin-top: 10px;
   display: flex;
   justify-content: center;
+  margin-top: 10px;
 }
 
 .preview img {
-  width: 220px;
-  border-radius: 12px;
-  object-fit: cover;
+  width: 260px;
+  border-radius: 16px;
   border: 2px solid #333;
 }
 
-/* BOTÃO */
+/* ========================================== */
+/* BOTÕES */
+/* ========================================== */
 .dashboard button {
-  margin-top: 10px;
-  padding: 12px;
-  border-radius: 8px;
   border: none;
-  background: #00bcd4;
-  color: #fff;
-  font-weight: bold;
+  padding: 12px 16px;
+  border-radius: 10px;
   cursor: pointer;
+  font-weight: bold;
   transition: 0.3s;
 }
 
-/* HOVER */
-.dashboard button:hover {
-  background: #0097a7;
-  transform: scale(1.02);
+.dashboard form button {
+  background: linear-gradient(135deg, #00bcd4, #0097a7);
+  color: white;
 }
 
+.dashboard form button:hover {
+  transform: translateY(-2px);
+}
+
+/* ========================================== */
+/* AGENDAMENTOS */
+/* ========================================== */
+.agendamentos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.agendamento-card {
+  background: #242424;
+  padding: 22px;
+  border-radius: 16px;
+  border: 1px solid #333;
+}
+
+.agendamento-card h3 {
+  margin-bottom: 15px;
+  font-size: 22px;
+}
+
+.agendamento-card p {
+  margin-bottom: 10px;
+  color: #ddd;
+  line-height: 1.5;
+}
+
+/* ========================================== */
+/* STATUS */
+/* ========================================== */
+.status {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.status.pendente {
+  background: #ffc10733;
+  color: #ffc107;
+}
+
+.status.confirmado {
+  background: #00c85333;
+  color: #00e676;
+}
+
+.status.cancelado {
+  background: #ff525233;
+  color: #ff5252;
+}
+
+.status.concluido {
+  background: #448aff33;
+  color: #82b1ff;
+}
+
+/* ========================================== */
+/* AÇÕES */
+/* ========================================== */
+.acoes-agendamento {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.confirmar-btn {
+  background: #00c853;
+  color: white;
+}
+
+.cancelar-btn {
+  background: #ff5252;
+  color: white;
+}
+
+.concluir-btn {
+  background: #448aff;
+  color: white;
+}
+
+.confirmar-btn:hover,
+.cancelar-btn:hover,
+.concluir-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.03);
+}
+
+/* ========================================== */
+/* SEM AGENDAMENTOS */
+/* ========================================== */
+.sem-agendamentos {
+  color: #aaa;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* ========================================== */
 /* RESPONSIVO */
-@media (max-width: 600px) {
-  .dashboard-container {
-    padding: 20px;
+/* ========================================== */
+@media (max-width: 768px) {
+
+  .dashboard-header-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-header-top h1 {
+    font-size: 30px;
+  }
+
+  .dashboard-section {
+    padding: 22px;
   }
 
   .preview img {
     width: 100%;
   }
+}
+
+/* ========================================== */
+/* GRID PORTFÓLIO */
+/* ========================================== */
+.portfolio-grid {
+  margin-top: 25px;
+
+  display: grid;
+
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(180px, 1fr)
+  );
+
+  gap: 20px;
+}
+
+/* CARD */
+.portfolio-card {
+  background: #222;
+  border-radius: 14px;
+  overflow: hidden;
+
+  border: 1px solid #333;
+
+  transition: 0.3s;
+}
+
+.portfolio-card:hover {
+  transform: translateY(-4px);
+  border-color: #00bcd4;
+}
+
+/* IMAGEM */
+.portfolio-card img {
+  width: 100%;
+  aspect-ratio: 1/1;
+
+  object-fit: cover;
+
+  display: block;
+}
+
+/* INFO */
+.portfolio-info {
+  padding: 12px;
+}
+
+.portfolio-info h3 {
+  font-size: 16px;
+  margin-bottom: 6px;
+
+  color: #fff;
+}
+
+.portfolio-info p {
+  font-size: 13px;
+  color: #bbb;
+
+  margin-bottom: 12px;
+}
+
+/* BOTÃO EXCLUIR */
+.portfolio-info .delete-btn {
+  width: 100%;
+
+  padding: 10px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #c62828;
+  color: white;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.portfolio-info .delete-btn:hover {
+  background: #e53935;
 }
