@@ -7,7 +7,9 @@
 
 /* BODY */
 .home {
-  background-color: #000;
+  background-image: url('../assets/background1b.png');
+  background-repeat: repeat;
+  /* background-attachment: fixed; */
   color: #fff;
   min-height: 100vh;
   font-family: Arial, sans-serif;
@@ -23,7 +25,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 40px;
-  background: linear-gradient(to top, #292929, #999);
+  background: linear-gradient(to top, #111111, #505050);
   backdrop-filter: blur(10px);
 }
 
@@ -167,7 +169,6 @@ html {
 
 /* PORTFÓLIO */
 .portfolio {
-  background: black;
   padding: 400px 20px;
   color: white;
 }

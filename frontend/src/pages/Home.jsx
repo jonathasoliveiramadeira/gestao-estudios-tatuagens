@@ -3,11 +3,13 @@ import logo from "../assets/logo.png";
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginModal from "../components/LoginModal";
+import PerfilModal from "../components/PerfilModal";
 import axios from "axios";
 import { AuthContext } from "../contexts/AuthContext";
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [perfilOpen, setPerfilOpen] = useState(false);
   const { user, login } = useContext(AuthContext);
   const [usuario, setUsuario] = useState(null);
   const [tatuadores, setTatuadores] = useState([]);
@@ -64,10 +66,6 @@ export default function Home() {
   }, []);
 
   // =========================
-  const irParaPerfil = () => {
-    navigate("/perfil");
-  };
-
   const irParaDashboard = () => {
     navigate("/dashboard-tatuador");
   };
@@ -126,7 +124,7 @@ export default function Home() {
             </span>
 
             {/* Avatar */}
-            <div className="avatar" onClick={irParaPerfil}>
+            <div className="avatar" onClick={() => setPerfilOpen(true)}>
               {usuario.foto ? (
                 <img src={usuario.foto} alt="Perfil" />
               ) : (
@@ -268,6 +266,12 @@ export default function Home() {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onLogin={login}
+      />
+
+      <PerfilModal
+        isOpen={perfilOpen}
+        onClose={() => setPerfilOpen(false)}
+        usuario={usuario}
       />
 
     </div>

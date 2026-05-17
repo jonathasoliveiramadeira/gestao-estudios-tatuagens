@@ -1,5 +1,7 @@
 .tatuador-page {
-  background: #000;
+  background-image: url('../assets/background2.png');
+  background-repeat: repeat;
+  background-attachment: fixed;
   color: #fff;
   min-height: 100vh;
   padding: 40px 20px;

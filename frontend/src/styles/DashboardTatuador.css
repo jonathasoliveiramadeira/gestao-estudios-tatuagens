@@ -3,7 +3,8 @@
 /* ========================================== */
 .dashboard {
   min-height: 100vh;
-  background: #0f0f0f;
+  background-image: url('../assets/background1b.png');
+  background-repeat: repeat;
   color: #fff;
   padding: 40px 20px;
   display: flex;

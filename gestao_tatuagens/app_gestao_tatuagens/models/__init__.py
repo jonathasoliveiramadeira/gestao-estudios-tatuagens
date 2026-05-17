@@ -6,3 +6,4 @@ from .servico import *
 from .avaliacao import *
 from .usuario import *
 from .portfolio import *
+from .notificacao import *

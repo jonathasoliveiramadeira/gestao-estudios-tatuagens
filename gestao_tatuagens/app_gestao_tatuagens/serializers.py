@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from .models.notificacao import Notificacao
 from .models.servico import Servico
 from .models.tatuador import Tatuador
 from .models.cliente import Cliente
@@ -81,3 +83,9 @@ class PortfolioSerializer(serializers.ModelSerializer):
         model = Portfolio
         fields = '__all__'
         read_only_fields = ['tatuador']
+
+class NotificacaoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notificacao
+        fields = '__all__'
+        read_only_fields = ['usuario']

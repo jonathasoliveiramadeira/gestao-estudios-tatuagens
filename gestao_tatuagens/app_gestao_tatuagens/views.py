@@ -32,8 +32,10 @@ from .serializers import UsuarioSerializer
 from .models.portfolio import Portfolio
 from .serializers import PortfolioSerializer
 
-from .permissions import IsTatuador
+from .models.notificacao import Notificacao
+from .serializers import NotificacaoSerializer
 
+from .permissions import IsTatuador
 
 # ==========================================
 # SERVIÇOS
@@ -389,7 +391,7 @@ def logout_view(request):
 # ==========================================
 # ATUALIZAR USUÁRIO
 # ==========================================
-@api_view(['PUT'])
+@api_view(['PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def atualizar_usuario(request):
     user = request.user
@@ -472,3 +474,21 @@ def google_login_success(request):
     return redirect(
         f"http://localhost:5173/google-success?token={access_token}"
     )
+
+# ==========================================
+# NOTIFICAÇÕES
+# ==========================================
+class NotificacaoViewSet(viewsets.ModelViewSet):
+    serializer_class = NotificacaoSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Notificacao.objects.filter(
+            usuario=self.request.user
+        )
+    
+    def perform_create(self, serializer):
+        Notificacao.objects.create(
+            usuario=Tatuador,
+            mensagem=f"Novo agendamento de {Cliente.email}"
+        )

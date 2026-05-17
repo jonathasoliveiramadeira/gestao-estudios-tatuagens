@@ -19,6 +19,7 @@ from .views import (
     login_view,
     csrf,
     PortfolioViewSet,
+    NotificacaoViewSet,
 )
 
 router = DefaultRouter()
@@ -29,6 +30,7 @@ router.register(r'clientes', ClienteViewSet)
 router.register(r'tatuadores', TatuadorViewSet)
 router.register(r'usuarios', UsuarioViewSet)
 router.register(r'portfolios', PortfolioViewSet)
+router.register(r'notificacoes', NotificacaoViewSet, basename='notificacao')
 
 urlpatterns = [
     # ROTAS AUTOMÁTICAS (CRUD)
